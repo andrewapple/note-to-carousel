@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { AlignLeft, AlignCenter, AlignRight, Download } from "lucide-react";
+import JSZip from "jszip";
 import {
   Carousel,
   CarouselContent,
@@ -109,17 +110,36 @@ const TextToImage = () => {
       // Generate all images in parallel
       const blobs = await Promise.all(textChunks.map(generateImage));
 
-      // Download each image
-      blobs.forEach((blob, index) => {
-        const url = URL.createObjectURL(blob);
+      if (blobs.length > 1) {
+        // Create a zip file for multiple images
+        const zip = new JSZip();
+        blobs.forEach((blob, index) => {
+          zip.file(`instagram-post-${index + 1}.png`, blob);
+        });
+
+        // Generate and download the zip file
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `instagram-post-${index + 1}.png`;
+        a.download = "instagram-posts.zip";
         a.click();
         URL.revokeObjectURL(url);
-      });
+      } else {
+        // Download single image directly
+        const url = URL.createObjectURL(blobs[0]);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "instagram-post.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
 
-      toast.success(`${textChunks.length} images downloaded successfully!`);
+      toast.success(
+        blobs.length > 1
+          ? `${blobs.length} images zipped and downloaded successfully!`
+          : "Image downloaded successfully!"
+      );
     } catch (error) {
       console.error("Error generating images:", error);
       toast.error("Failed to generate images. Please try again.");
