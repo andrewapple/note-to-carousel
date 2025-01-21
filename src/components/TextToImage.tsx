@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { AlignLeft, AlignCenter, AlignRight, Download } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const THEMES = [
   { bg: "bg-theme-1", text: "text-gray-900" },
@@ -11,6 +18,9 @@ const THEMES = [
   { bg: "bg-theme-4", text: "text-gray-900" },
 ];
 
+const MAX_TOTAL_CHARS = 5000;
+const MAX_CHARS_PER_SLIDE = 500;
+
 const TextToImage = () => {
   const [text, setText] = useState("");
   const [selectedTheme, setSelectedTheme] = useState(0);
@@ -18,15 +28,18 @@ const TextToImage = () => {
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
+    const newText = e.target.value;
+    if (newText.length <= MAX_TOTAL_CHARS) {
+      setText(newText);
+    }
   };
 
-  const generateImage = async () => {
-    if (!text.trim()) {
-      toast.error("Please enter some text first!");
-      return;
-    }
+  // Split text into chunks of MAX_CHARS_PER_SLIDE characters
+  const textChunks = text
+    .match(new RegExp(`.{1,${MAX_CHARS_PER_SLIDE}}`, "g"))
+    ?.map((chunk) => chunk.trim()) || [];
 
+  const generateImage = async (chunk: string) => {
     try {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -48,20 +61,23 @@ const TextToImage = () => {
       ctx.textAlign = alignment;
 
       // Calculate text position
-      const x = alignment === "left" ? 100 : 
-               alignment === "right" ? canvas.width - 100 : 
-               canvas.width / 2;
+      const x =
+        alignment === "left"
+          ? 100
+          : alignment === "right"
+          ? canvas.width - 100
+          : canvas.width / 2;
       let y = 100;
 
       // Split text into lines and draw
-      const words = text.split(" ");
+      const words = chunk.split(" ");
       let line = "";
       const maxWidth = canvas.width - 200;
 
       for (let word of words) {
         const testLine = line + word + " ";
         const metrics = ctx.measureText(testLine);
-        
+
         if (metrics.width > maxWidth) {
           ctx.fillText(line, x, y);
           line = word + " ";
@@ -72,21 +88,41 @@ const TextToImage = () => {
       }
       ctx.fillText(line, x, y);
 
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) return;
+      return new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+        }, "image/png");
+      });
+    } catch (error) {
+      console.error("Error generating image:", error);
+      throw error;
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!text.trim()) {
+      toast.error("Please enter some text first!");
+      return;
+    }
+
+    try {
+      // Generate all images in parallel
+      const blobs = await Promise.all(textChunks.map(generateImage));
+
+      // Download each image
+      blobs.forEach((blob, index) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "instagram-post.png";
+        a.download = `instagram-post-${index + 1}.png`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success("Image downloaded successfully!");
-      }, "image/png");
+      });
 
+      toast.success(`${textChunks.length} images downloaded successfully!`);
     } catch (error) {
-      console.error("Error generating image:", error);
-      toast.error("Failed to generate image. Please try again.");
+      console.error("Error generating images:", error);
+      toast.error("Failed to generate images. Please try again.");
     }
   };
 
@@ -95,7 +131,7 @@ const TextToImage = () => {
       <h1 className="text-3xl font-bold text-center mb-8">
         Instagram Text Post Generator
       </h1>
-      
+
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
           <Textarea
@@ -103,7 +139,7 @@ const TextToImage = () => {
             className="min-h-[200px] resize-none"
             value={text}
             onChange={handleTextChange}
-            maxLength={500}
+            maxLength={MAX_TOTAL_CHARS}
           />
           <div className="flex justify-between items-center">
             <div className="flex gap-2">
@@ -130,39 +166,66 @@ const TextToImage = () => {
               </Button>
             </div>
             <span className="text-sm text-gray-500">
-              {text.length}/500 characters
+              {text.length}/{MAX_TOTAL_CHARS} characters
             </span>
           </div>
-          
+
           <div className="flex gap-2">
             {THEMES.map((theme, index) => (
               <button
                 key={index}
                 className={`w-8 h-8 rounded-full ${theme.bg} border-2 transition-all ${
-                  selectedTheme === index ? "border-blue-500 scale-110" : "border-transparent"
+                  selectedTheme === index
+                    ? "border-blue-500 scale-110"
+                    : "border-transparent"
                 }`}
                 onClick={() => setSelectedTheme(index)}
               />
             ))}
           </div>
-          
+
           <Button
             className="w-full"
-            onClick={generateImage}
+            onClick={handleDownload}
             disabled={!text.trim()}
           >
-            <Download className="mr-2 h-4 w-4" /> Download Image
+            <Download className="mr-2 h-4 w-4" /> Download Images
           </Button>
         </div>
 
-        <div
-          ref={previewRef}
-          className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} ${
-            THEMES[selectedTheme].text
-          } p-8 flex items-center justify-center text-lg`}
-          style={{ textAlign: alignment }}
-        >
-          {text || "Preview will appear here"}
+        <div className="aspect-square">
+          {textChunks.length > 0 ? (
+            <Carousel>
+              <CarouselContent>
+                {textChunks.map((chunk, index) => (
+                  <CarouselItem key={index}>
+                    <div
+                      className={`aspect-square rounded-lg ${
+                        THEMES[selectedTheme].bg
+                      } ${
+                        THEMES[selectedTheme].text
+                      } p-8 flex items-center justify-center text-lg`}
+                      style={{ textAlign: alignment }}
+                    >
+                      {chunk}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          ) : (
+            <div
+              ref={previewRef}
+              className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} ${
+                THEMES[selectedTheme].text
+              } p-8 flex items-center justify-center text-lg`}
+              style={{ textAlign: alignment }}
+            >
+              Preview will appear here
+            </div>
+          )}
         </div>
       </div>
     </div>
