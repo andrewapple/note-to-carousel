@@ -20,7 +20,8 @@ const THEMES = [
 ];
 
 const MAX_TOTAL_CHARS = 5000;
-const MAX_CHARS_PER_SLIDE = 500;
+const MIN_CHARS_PER_SLIDE = 400;
+const MAX_CHARS_PER_SLIDE = 450;
 
 const TextToImage = () => {
   const [text, setText] = useState("");
@@ -35,10 +36,34 @@ const TextToImage = () => {
     }
   };
 
-  // Split text into chunks of MAX_CHARS_PER_SLIDE characters
-  const textChunks = text
-    .match(new RegExp(`.{1,${MAX_CHARS_PER_SLIDE}}`, "g"))
-    ?.map((chunk) => chunk.trim()) || [];
+  // Split text into chunks between MIN_CHARS_PER_SLIDE and MAX_CHARS_PER_SLIDE characters
+  const textChunks = text.length > 0 ? splitTextIntoChunks(text) : [];
+
+  function splitTextIntoChunks(text: string): string[] {
+    const chunks: string[] = [];
+    let remainingText = text;
+
+    while (remainingText.length > 0) {
+      let chunk = remainingText.slice(0, MAX_CHARS_PER_SLIDE);
+      
+      // If we're not at the end and the next character isn't a space,
+      // look backwards for the last space before MAX_CHARS_PER_SLIDE
+      if (remainingText.length > MAX_CHARS_PER_SLIDE && !remainingText[MAX_CHARS_PER_SLIDE].match(/\s/)) {
+        const lastSpace = chunk.lastIndexOf(' ');
+        if (lastSpace > MIN_CHARS_PER_SLIDE) {
+          chunk = chunk.slice(0, lastSpace);
+        }
+      }
+
+      // Trim the chunk and add it to our chunks array
+      chunks.push(chunk.trim());
+      
+      // Remove the chunk from the remaining text
+      remainingText = remainingText.slice(chunk.length).trim();
+    }
+
+    return chunks;
+  }
 
   const generateImage = async (chunk: string) => {
     try {
