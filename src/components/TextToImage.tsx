@@ -5,6 +5,13 @@ import { toast } from "sonner";
 import { AlignLeft, AlignCenter, AlignRight, Download } from "lucide-react";
 import JSZip from "jszip";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -17,6 +24,21 @@ const THEMES = [
   { bg: "bg-theme-2", text: "text-gray-900" },
   { bg: "bg-theme-3", text: "text-gray-900" },
   { bg: "bg-theme-4", text: "text-gray-900" },
+  { bg: "bg-theme-5", text: "text-gray-900" },
+  { bg: "bg-theme-6", text: "text-gray-900" },
+];
+
+const FONTS = [
+  { name: "Georgia", class: "font-georgia" },
+  { name: "Courier New", class: "font-courier" },
+  { name: "Palatino", class: "font-palatino" },
+  { name: "Helvetica", class: "font-helvetica" },
+  { name: "Bookman Old Style", class: "font-bookman" },
+];
+
+const TEXT_COLORS = [
+  { name: "Black", value: "#000000" },
+  { name: "White", value: "#FFFFFF" },
 ];
 
 const MAX_TOTAL_CHARS = 12000;
@@ -26,6 +48,8 @@ const MAX_CHARS_PER_SLIDE = 600;
 const TextToImage = () => {
   const [text, setText] = useState("");
   const [selectedTheme, setSelectedTheme] = useState(0);
+  const [selectedFont, setSelectedFont] = useState(FONTS[0].name);
+  const [selectedTextColor, setSelectedTextColor] = useState(TEXT_COLORS[0].value);
   const [alignment, setAlignment] = useState<"left" | "center" | "right">("left");
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -41,34 +65,22 @@ const TextToImage = () => {
 
   function splitTextIntoChunks(text: string): string[] {
     const chunks: string[] = [];
-    // Split text by double line breaks first
-    const paragraphs = text.split(/\n\s*\n/);
+    // Split text by triple line breaks first
+    const paragraphs = text.split(/\n\n\n/);
     let currentChunk = "";
     
     for (let i = 0; i < paragraphs.length; i++) {
       const paragraph = paragraphs[i].trim();
-      const words = paragraph.split(/\s+/);
       
-      for (let j = 0; j < words.length; j++) {
-        const word = words[j];
-        const testChunk = currentChunk + (currentChunk ? " " : "") + word;
-        
-        // If adding this word would exceed the limit
-        if (testChunk.length > MAX_CHARS_PER_SLIDE) {
-          // If we have content in currentChunk, add it to chunks
-          if (currentChunk) {
-            chunks.push(currentChunk);
-            currentChunk = word;
-          } else {
-            // If the single word is longer than the limit, we have to include it
-            currentChunk = word;
-          }
-        } else {
-          currentChunk = testChunk;
-        }
+      // If this paragraph would make the current chunk too long, start a new chunk
+      if (currentChunk && (currentChunk + "\n\n" + paragraph).length > MAX_CHARS_PER_SLIDE) {
+        chunks.push(currentChunk);
+        currentChunk = paragraph;
+      } else {
+        currentChunk = currentChunk ? currentChunk + "\n\n" + paragraph : paragraph;
       }
       
-      // Add paragraph break if not the last paragraph
+      // If this is a triple line break, force start a new chunk
       if (i < paragraphs.length - 1) {
         chunks.push(currentChunk);
         currentChunk = "";
@@ -101,8 +113,9 @@ const TextToImage = () => {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Configure text
-      ctx.fillStyle = "#000000";
-      ctx.font = "bold 48px Inter";
+      ctx.fillStyle = selectedTextColor;
+      const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
+      ctx.font = `bold 48px ${fontFamily}`;
       ctx.textAlign = alignment;
 
       // Calculate text position for horizontal alignment
@@ -116,7 +129,7 @@ const TextToImage = () => {
       // Split text into lines and measure total height
       const maxWidth = canvas.width - 200;
       const lines: string[] = [];
-      const paragraphs = chunk.split(/\n\s*\n/);
+      const paragraphs = chunk.split(/\n\n/);
       
       paragraphs.forEach((paragraph, pIndex) => {
         const words = paragraph.split(" ");
@@ -142,7 +155,7 @@ const TextToImage = () => {
           lines.push(currentLine);
         }
         
-        // Add empty line between paragraphs
+        // Add empty line between paragraphs (double line break)
         if (pIndex < paragraphs.length - 1) {
           lines.push("");
         }
@@ -227,7 +240,7 @@ const TextToImage = () => {
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
           <Textarea
-            placeholder="Enter your text here... Press Enter twice for line breaks"
+            placeholder="Enter your text here... Press Enter twice for line breaks on same image, three times for new image"
             className="min-h-[200px] resize-none whitespace-pre-wrap"
             value={text}
             onChange={handleTextChange}
@@ -262,18 +275,61 @@ const TextToImage = () => {
             </span>
           </div>
 
-          <div className="flex gap-2">
-            {THEMES.map((theme, index) => (
-              <button
-                key={index}
-                className={`w-8 h-8 rounded-full ${theme.bg} border-2 transition-all ${
-                  selectedTheme === index
-                    ? "border-blue-500 scale-110"
-                    : "border-transparent"
-                }`}
-                onClick={() => setSelectedTheme(index)}
-              />
-            ))}
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Font</label>
+              <Select value={selectedFont} onValueChange={setSelectedFont}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select font" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FONTS.map((font) => (
+                    <SelectItem
+                      key={font.name}
+                      value={font.name}
+                      className={font.class}
+                    >
+                      {font.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Background Color</label>
+              <div className="flex gap-2">
+                {THEMES.map((theme, index) => (
+                  <button
+                    key={index}
+                    className={`w-8 h-8 rounded-full ${theme.bg} border-2 transition-all ${
+                      selectedTheme === index
+                        ? "border-blue-500 scale-110"
+                        : "border-transparent"
+                    }`}
+                    onClick={() => setSelectedTheme(index)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Font Color</label>
+              <div className="flex gap-2">
+                {TEXT_COLORS.map((color, index) => (
+                  <button
+                    key={index}
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                      selectedTextColor === color.value
+                        ? "border-blue-500 scale-110"
+                        : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    onClick={() => setSelectedTextColor(color.value)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
           <Button
@@ -294,10 +350,13 @@ const TextToImage = () => {
                     <div
                       className={`aspect-square rounded-lg ${
                         THEMES[selectedTheme].bg
-                      } ${
-                        THEMES[selectedTheme].text
-                      } p-8 flex items-center justify-center text-lg whitespace-pre-wrap`}
-                      style={{ textAlign: alignment }}
+                      } p-8 flex items-center justify-center text-lg whitespace-pre-wrap ${
+                        FONTS.find(f => f.name === selectedFont)?.class || 'serif'
+                      }`}
+                      style={{ 
+                        textAlign: alignment,
+                        color: selectedTextColor
+                      }}
                     >
                       {chunk}
                     </div>
@@ -310,10 +369,13 @@ const TextToImage = () => {
           ) : (
             <div
               ref={previewRef}
-              className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} ${
-                THEMES[selectedTheme].text
-              } p-8 flex items-center justify-center text-lg`}
-              style={{ textAlign: alignment }}
+              className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} p-8 flex items-center justify-center text-lg ${
+                FONTS.find(f => f.name === selectedFont)?.class || 'serif'
+              }`}
+              style={{ 
+                textAlign: alignment,
+                color: selectedTextColor
+              }}
             >
               Preview will appear here
             </div>
