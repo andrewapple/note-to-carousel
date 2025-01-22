@@ -71,19 +71,31 @@ const TextToImage = () => {
     
     for (let i = 0; i < paragraphs.length; i++) {
       const paragraph = paragraphs[i].trim();
+      const paragraphParts = paragraph.split(/\n\n/);
       
-      // If this paragraph would make the current chunk too long, start a new chunk
-      if (currentChunk && (currentChunk + "\n\n" + paragraph).length > MAX_CHARS_PER_SLIDE) {
-        chunks.push(currentChunk);
-        currentChunk = paragraph;
-      } else {
-        currentChunk = currentChunk ? currentChunk + "\n\n" + paragraph : paragraph;
+      for (let part of paragraphParts) {
+        // If adding this part would exceed MAX_CHARS_PER_SLIDE, start a new chunk
+        if (currentChunk && (currentChunk + "\n\n" + part).length > MAX_CHARS_PER_SLIDE) {
+          chunks.push(currentChunk);
+          currentChunk = part;
+        } else {
+          // If this is the first part or we can add to current chunk
+          currentChunk = currentChunk ? currentChunk + "\n\n" + part : part;
+        }
+        
+        // If current chunk is approaching limit, push it and start new
+        if (currentChunk.length >= MAX_CHARS_PER_SLIDE) {
+          chunks.push(currentChunk);
+          currentChunk = "";
+        }
       }
       
-      // If this is a triple line break, force start a new chunk
-      if (i < paragraphs.length - 1) {
-        chunks.push(currentChunk);
-        currentChunk = "";
+      // If this is a triple line break or we're at max chars, force start a new chunk
+      if (i < paragraphs.length - 1 || currentChunk.length >= MAX_CHARS_PER_SLIDE) {
+        if (currentChunk) {
+          chunks.push(currentChunk);
+          currentChunk = "";
+        }
       }
     }
     
