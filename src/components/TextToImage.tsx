@@ -19,9 +19,9 @@ const THEMES = [
   { bg: "bg-theme-4", text: "text-gray-900" },
 ];
 
-const MAX_TOTAL_CHARS = 5000;
-const MIN_CHARS_PER_SLIDE = 400;
-const MAX_CHARS_PER_SLIDE = 450;
+const MAX_TOTAL_CHARS = 12000;
+const MAX_IMAGES = 20;
+const MAX_CHARS_PER_SLIDE = 600;
 
 const TextToImage = () => {
   const [text, setText] = useState("");
@@ -36,33 +36,52 @@ const TextToImage = () => {
     }
   };
 
-  // Split text into chunks between MIN_CHARS_PER_SLIDE and MAX_CHARS_PER_SLIDE characters
+  // Split text into chunks respecting word boundaries and line breaks
   const textChunks = text.length > 0 ? splitTextIntoChunks(text) : [];
 
   function splitTextIntoChunks(text: string): string[] {
     const chunks: string[] = [];
-    let remainingText = text;
-
-    while (remainingText.length > 0) {
-      let chunk = remainingText.slice(0, MAX_CHARS_PER_SLIDE);
+    // Split text by double line breaks first
+    const paragraphs = text.split(/\n\s*\n/);
+    let currentChunk = "";
+    
+    for (let i = 0; i < paragraphs.length; i++) {
+      const paragraph = paragraphs[i].trim();
+      const words = paragraph.split(/\s+/);
       
-      // If we're not at the end and the next character isn't a space,
-      // look backwards for the last space before MAX_CHARS_PER_SLIDE
-      if (remainingText.length > MAX_CHARS_PER_SLIDE && !remainingText[MAX_CHARS_PER_SLIDE].match(/\s/)) {
-        const lastSpace = chunk.lastIndexOf(' ');
-        if (lastSpace > MIN_CHARS_PER_SLIDE) {
-          chunk = chunk.slice(0, lastSpace);
+      for (let j = 0; j < words.length; j++) {
+        const word = words[j];
+        const testChunk = currentChunk + (currentChunk ? " " : "") + word;
+        
+        // If adding this word would exceed the limit
+        if (testChunk.length > MAX_CHARS_PER_SLIDE) {
+          // If we have content in currentChunk, add it to chunks
+          if (currentChunk) {
+            chunks.push(currentChunk);
+            currentChunk = word;
+          } else {
+            // If the single word is longer than the limit, we have to include it
+            currentChunk = word;
+          }
+        } else {
+          currentChunk = testChunk;
         }
       }
-
-      // Trim the chunk and add it to our chunks array
-      chunks.push(chunk.trim());
       
-      // Remove the chunk from the remaining text
-      remainingText = remainingText.slice(chunk.length).trim();
+      // Add paragraph break if not the last paragraph
+      if (i < paragraphs.length - 1) {
+        chunks.push(currentChunk);
+        currentChunk = "";
+      }
+    }
+    
+    // Add the last chunk if there's anything left
+    if (currentChunk) {
+      chunks.push(currentChunk);
     }
 
-    return chunks;
+    // Limit to MAX_IMAGES
+    return chunks.slice(0, MAX_IMAGES);
   }
 
   const generateImage = async (chunk: string) => {
@@ -86,33 +105,61 @@ const TextToImage = () => {
       ctx.font = "bold 48px Inter";
       ctx.textAlign = alignment;
 
-      // Calculate text position
+      // Calculate text position for horizontal alignment
       const x =
         alignment === "left"
           ? 100
           : alignment === "right"
           ? canvas.width - 100
           : canvas.width / 2;
-      let y = 100;
 
-      // Split text into lines and draw
-      const words = chunk.split(" ");
-      let line = "";
+      // Split text into lines and measure total height
       const maxWidth = canvas.width - 200;
-
-      for (let word of words) {
-        const testLine = line + word + " ";
-        const metrics = ctx.measureText(testLine);
-
-        if (metrics.width > maxWidth) {
-          ctx.fillText(line, x, y);
-          line = word + " ";
-          y += 60;
-        } else {
-          line = testLine;
+      const lines: string[] = [];
+      const paragraphs = chunk.split(/\n\s*\n/);
+      
+      paragraphs.forEach((paragraph, pIndex) => {
+        const words = paragraph.split(" ");
+        let currentLine = "";
+        
+        words.forEach(word => {
+          const testLine = currentLine + (currentLine ? " " : "") + word;
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth) {
+            if (currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = word;
+            }
+          } else {
+            currentLine = testLine;
+          }
+        });
+        
+        if (currentLine) {
+          lines.push(currentLine);
         }
-      }
-      ctx.fillText(line, x, y);
+        
+        // Add empty line between paragraphs
+        if (pIndex < paragraphs.length - 1) {
+          lines.push("");
+        }
+      });
+
+      // Calculate total height and starting Y position to center vertically
+      const lineHeight = 60;
+      const totalTextHeight = lines.length * lineHeight;
+      let y = (canvas.height - totalTextHeight) / 2;
+
+      // Draw the lines
+      lines.forEach(line => {
+        if (line) {
+          ctx.fillText(line, x, y);
+        }
+        y += lineHeight;
+      });
 
       return new Promise<Blob>((resolve) => {
         canvas.toBlob((blob) => {
@@ -180,8 +227,8 @@ const TextToImage = () => {
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
           <Textarea
-            placeholder="Enter your text here..."
-            className="min-h-[200px] resize-none"
+            placeholder="Enter your text here... Press Enter twice for line breaks"
+            className="min-h-[200px] resize-none whitespace-pre-wrap"
             value={text}
             onChange={handleTextChange}
             maxLength={MAX_TOTAL_CHARS}
@@ -249,7 +296,7 @@ const TextToImage = () => {
                         THEMES[selectedTheme].bg
                       } ${
                         THEMES[selectedTheme].text
-                      } p-8 flex items-center justify-center text-lg`}
+                      } p-8 flex items-center justify-center text-lg whitespace-pre-wrap`}
                       style={{ textAlign: alignment }}
                     >
                       {chunk}
