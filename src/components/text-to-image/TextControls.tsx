@@ -41,58 +41,6 @@ export const TextControls = ({
   const imageBreaks = getImageBreakPositions(text);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-  React.useEffect(() => {
-    if (textareaRef.current) {
-      const textarea = textareaRef.current;
-      const originalText = textarea.value;
-      
-      // Create overlay for image break indicators
-      const overlay = document.createElement('div');
-      overlay.style.position = 'absolute';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.right = '0';
-      overlay.style.bottom = '0';
-      overlay.style.pointerEvents = 'none';
-      overlay.style.whiteSpace = 'pre-wrap';
-      overlay.style.wordWrap = 'break-word';
-      overlay.style.color = 'transparent';
-      overlay.style.overflow = 'hidden';
-      
-      // Match textarea styles
-      overlay.style.padding = window.getComputedStyle(textarea).padding;
-      overlay.style.font = window.getComputedStyle(textarea).font;
-      overlay.style.lineHeight = window.getComputedStyle(textarea).lineHeight;
-      
-      let modifiedText = originalText;
-      imageBreaks.forEach((breakInfo) => {
-        const indicator = `\n---Beginning Image Number ${breakInfo.imageNumber}---\n`;
-        modifiedText = modifiedText.slice(0, breakInfo.position) + indicator + modifiedText.slice(breakInfo.position);
-      });
-      
-      // Create spans for the indicators with styling
-      const parts = modifiedText.split(/---(Beginning Image Number \d+)---/);
-      overlay.innerHTML = parts.map((part, i) => {
-        if (i % 2 === 1) { // This is an indicator
-          return `<span style="color: #666; font-style: italic; opacity: 0.6;">${part}</span>`;
-        }
-        return part;
-      }).join('');
-      
-      // Position the overlay
-      if (textarea.parentElement) {
-        textarea.parentElement.style.position = 'relative';
-        textarea.parentElement.appendChild(overlay);
-      }
-      
-      return () => {
-        if (textarea.parentElement) {
-          textarea.parentElement.removeChild(overlay);
-        }
-      };
-    }
-  }, [text, imageBreaks]);
-
   return (
     <div className="space-y-4">
       <Textarea
