@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getImageBreakPositions } from "@/utils/textProcessing";
 
 interface TextControlsProps {
   text: string;
@@ -36,9 +37,61 @@ export const TextControls = ({
   setSelectedFont,
   maxTotalChars,
 }: TextControlsProps) => {
+  const imageBreaks = getImageBreakPositions(text);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  React.useEffect(() => {
+    if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      const originalText = textarea.value;
+      
+      // Create overlay for image break indicators
+      const overlay = document.createElement('div');
+      overlay.style.position = 'absolute';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.whiteSpace = 'pre-wrap';
+      overlay.style.wordWrap = 'break-word';
+      overlay.style.color = 'transparent';
+      overlay.style.overflow = 'hidden';
+      
+      // Match textarea styles
+      overlay.style.padding = window.getComputedStyle(textarea).padding;
+      overlay.style.font = window.getComputedStyle(textarea).font;
+      overlay.style.lineHeight = window.getComputedStyle(textarea).lineHeight;
+      
+      let modifiedText = originalText;
+      imageBreaks.forEach(({ position, imageNumber }) => {
+        const indicator = `\n---Beginning Image Number ${imageNumber}---\n`;
+        modifiedText = modifiedText.slice(0, position) + indicator + modifiedText.slice(position);
+      });
+      
+      // Create spans for the indicators with styling
+      const parts = modifiedText.split(/---(Beginning Image Number \d+)---/);
+      overlay.innerHTML = parts.map((part, i) => {
+        if (i % 2 === 1) { // This is an indicator
+          return `<span style="color: #666; font-style: italic; opacity: 0.6;">${part}</span>`;
+        }
+        return part;
+      }).join('');
+      
+      // Position the overlay
+      textarea.parentElement?.style.position = 'relative';
+      textarea.parentElement?.appendChild(overlay);
+      
+      return () => {
+        overlay.remove();
+      };
+    }
+  }, [text, imageBreaks]);
+
   return (
     <div className="space-y-4">
       <Textarea
+        ref={textareaRef}
         placeholder="Enter your text here... Press Enter twice for line breaks on same image, three times for new image"
         className="min-h-[200px] resize-none whitespace-pre-wrap"
         value={text}

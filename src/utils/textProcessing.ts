@@ -1,41 +1,52 @@
-export const MAX_TOTAL_CHARS = 12000;
-export const MAX_IMAGES = 20;
 export const MAX_CHARS_PER_SLIDE = 600;
+export const MAX_TOTAL_CHARS = 10000;
 
-export function splitTextIntoChunks(text: string): string[] {
+export const splitTextIntoChunks = (text: string): string[] => {
   const chunks: string[] = [];
-  const paragraphs = text.split(/\n\n\n/);
-  let currentChunk = "";
+  const paragraphs = text.split(/\n{3,}/);
+  let currentChunk = '';
+
+  for (const paragraph of paragraphs) {
+    if ((currentChunk + paragraph).length > MAX_CHARS_PER_SLIDE) {
+      if (currentChunk) {
+        chunks.push(currentChunk.trim());
+      }
+      currentChunk = paragraph;
+    } else if (currentChunk) {
+      currentChunk += '\n\n' + paragraph;
+    } else {
+      currentChunk = paragraph;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks;
+};
+
+export const getImageBreakPositions = (text: string): number[] => {
+  const positions: number[] = [];
+  let pos = 0;
+  let imageNumber = 2; // Start from 2 since first image doesn't need indicator
+
+  const paragraphs = text.split(/\n/);
   
   for (let i = 0; i < paragraphs.length; i++) {
-    const paragraph = paragraphs[i].trim();
-    const paragraphParts = paragraph.split(/\n\n/);
+    const paragraph = paragraphs[i];
     
-    for (let part of paragraphParts) {
-      if (currentChunk && (currentChunk + "\n\n" + part).length > MAX_CHARS_PER_SLIDE) {
-        chunks.push(currentChunk);
-        currentChunk = part;
-      } else {
-        currentChunk = currentChunk ? currentChunk + "\n\n" + part : part;
-      }
-      
-      if (currentChunk.length >= MAX_CHARS_PER_SLIDE) {
-        chunks.push(currentChunk);
-        currentChunk = "";
-      }
+    if (i < paragraphs.length - 2 && 
+        paragraphs[i + 1] === '' && 
+        paragraphs[i + 2] === '') {
+      pos += paragraph.length + 1; // +1 for the newline
+      positions.push({ position: pos, imageNumber });
+      imageNumber++;
+      i += 2; // Skip the next two empty lines
+    } else {
+      pos += paragraph.length + 1; // +1 for the newline
     }
-    
-    if (i < paragraphs.length - 1 || currentChunk.length >= MAX_CHARS_PER_SLIDE) {
-      if (currentChunk) {
-        chunks.push(currentChunk);
-        currentChunk = "";
-      }
-    }
-  }
-  
-  if (currentChunk) {
-    chunks.push(currentChunk);
   }
 
-  return chunks.slice(0, MAX_IMAGES);
-}
+  return positions;
+};
