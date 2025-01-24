@@ -26,8 +26,13 @@ export const splitTextIntoChunks = (text: string): string[] => {
   return chunks;
 };
 
-export const getImageBreakPositions = (text: string): number[] => {
-  const positions: number[] = [];
+interface ImageBreakInfo {
+  position: number;
+  imageNumber: number;
+}
+
+export const getImageBreakPositions = (text: string): ImageBreakInfo[] => {
+  const positions: ImageBreakInfo[] = [];
   let pos = 0;
   let imageNumber = 2; // Start from 2 since first image doesn't need indicator
 

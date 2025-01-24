@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
@@ -64,9 +65,9 @@ export const TextControls = ({
       overlay.style.lineHeight = window.getComputedStyle(textarea).lineHeight;
       
       let modifiedText = originalText;
-      imageBreaks.forEach(({ position, imageNumber }) => {
-        const indicator = `\n---Beginning Image Number ${imageNumber}---\n`;
-        modifiedText = modifiedText.slice(0, position) + indicator + modifiedText.slice(position);
+      imageBreaks.forEach((breakInfo) => {
+        const indicator = `\n---Beginning Image Number ${breakInfo.imageNumber}---\n`;
+        modifiedText = modifiedText.slice(0, breakInfo.position) + indicator + modifiedText.slice(breakInfo.position);
       });
       
       // Create spans for the indicators with styling
@@ -79,11 +80,15 @@ export const TextControls = ({
       }).join('');
       
       // Position the overlay
-      textarea.parentElement?.style.position = 'relative';
-      textarea.parentElement?.appendChild(overlay);
+      if (textarea.parentElement) {
+        textarea.parentElement.style.position = 'relative';
+        textarea.parentElement.appendChild(overlay);
+      }
       
       return () => {
-        overlay.remove();
+        if (textarea.parentElement) {
+          textarea.parentElement.removeChild(overlay);
+        }
       };
     }
   }, [text, imageBreaks]);
