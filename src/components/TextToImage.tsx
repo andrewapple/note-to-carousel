@@ -59,7 +59,8 @@ const TextToImage = () => {
       // Text settings
       ctx.fillStyle = selectedTextColor;
       const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
-      ctx.font = `bold 48px ${fontFamily}`;
+     // ctx.font = `bold 48px ${fontFamily}`;
+      ctx.font = `bold 38px ${fontFamily}`;
       ctx.textAlign = alignment;
 
       const x =
