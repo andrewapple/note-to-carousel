@@ -1,5 +1,5 @@
 export const MAX_CHARS_PER_SLIDE = 600;
-export const MAX_TOTAL_CHARS = 10000;
+export const MAX_TOTAL_CHARS = 12000;
 
 export const splitTextIntoChunks = (text: string): string[] => {
   const chunks: string[] = [];
@@ -7,15 +7,29 @@ export const splitTextIntoChunks = (text: string): string[] => {
   let currentChunk = '';
 
   for (const paragraph of paragraphs) {
-    if ((currentChunk + paragraph).length > MAX_CHARS_PER_SLIDE) {
-      if (currentChunk) {
-        chunks.push(currentChunk.trim());
+    // If this is a new chunk due to triple newline
+    if (currentChunk && paragraph) {
+      chunks.push(currentChunk.trim());
+      currentChunk = paragraph;
+      continue;
+    }
+
+    // Split paragraph into words
+    const words = paragraph.split(/(\s+)/);
+    
+    for (const word of words) {
+      // Check if adding this word would exceed the limit
+      if ((currentChunk + word).length > MAX_CHARS_PER_SLIDE) {
+        if (currentChunk) {
+          chunks.push(currentChunk.trim());
+          currentChunk = word;
+        } else {
+          // If a single word is longer than the limit, we still need to include it
+          currentChunk = word;
+        }
+      } else {
+        currentChunk += word;
       }
-      currentChunk = paragraph;
-    } else if (currentChunk) {
-      currentChunk += '\n\n' + paragraph;
-    } else {
-      currentChunk = paragraph;
     }
   }
 
@@ -34,7 +48,7 @@ interface ImageBreakInfo {
 export const getImageBreakPositions = (text: string): ImageBreakInfo[] => {
   const positions: ImageBreakInfo[] = [];
   let pos = 0;
-  let imageNumber = 2; // Start from 2 since first image doesn't need indicator
+  let imageNumber = 2;
 
   const paragraphs = text.split(/\n/);
   
@@ -44,12 +58,12 @@ export const getImageBreakPositions = (text: string): ImageBreakInfo[] => {
     if (i < paragraphs.length - 2 && 
         paragraphs[i + 1] === '' && 
         paragraphs[i + 2] === '') {
-      pos += paragraph.length + 1; // +1 for the newline
+      pos += paragraph.length + 1;
       positions.push({ position: pos, imageNumber });
       imageNumber++;
-      i += 2; // Skip the next two empty lines
+      i += 2;
     } else {
-      pos += paragraph.length + 1; // +1 for the newline
+      pos += paragraph.length + 1;
     }
   }
 
