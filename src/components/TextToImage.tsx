@@ -50,11 +50,13 @@ const TextToImage = () => {
       canvas.width = 1080;
       canvas.height = 1080;
 
+      // Fill background
       ctx.fillStyle = getComputedStyle(document.documentElement)
         .getPropertyValue(`--theme-${selectedTheme + 1}`)
         .trim();
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Text settings
       ctx.fillStyle = selectedTextColor;
       const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
       ctx.font = `bold 48px ${fontFamily}`;
@@ -71,6 +73,7 @@ const TextToImage = () => {
       const lines: string[] = [];
       const paragraphs = chunk.split(/\n\n/);
       
+      // Calculate lines with proper word wrapping
       paragraphs.forEach((paragraph, pIndex) => {
         const words = paragraph.split(" ");
         let currentLine = "";
@@ -95,20 +98,28 @@ const TextToImage = () => {
           lines.push(currentLine);
         }
         
+        // Add empty line between paragraphs, except after the last paragraph
         if (pIndex < paragraphs.length - 1) {
           lines.push("");
         }
       });
 
+      // Calculate total text height and position vertically
       const lineHeight = 60;
       const totalTextHeight = lines.length * lineHeight;
-      let y = (canvas.height - totalTextHeight) / 2;
+      const verticalPadding = 100; // Minimum padding from top and bottom
+      const startY = Math.max(
+        verticalPadding,
+        (canvas.height - totalTextHeight) / 2
+      );
 
+      // Draw text with proper vertical positioning
+      let currentY = startY;
       lines.forEach(line => {
         if (line) {
-          ctx.fillText(line, x, y);
+          ctx.fillText(line, x, currentY);
         }
-        y += lineHeight;
+        currentY += lineHeight;
       });
 
       return new Promise<Blob>((resolve) => {
