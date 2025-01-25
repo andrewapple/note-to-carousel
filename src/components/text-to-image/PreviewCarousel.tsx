@@ -41,7 +41,7 @@ export const PreviewCarousel = ({
                 color: selectedTextColor,
               }}
             >
-              <div className="max-h-full overflow-y-auto">
+              <div className="max-h-full overflow-y-auto whitespace-pre-wrap">
                 {chunk}
               </div>
             </div>
