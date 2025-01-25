@@ -45,7 +45,7 @@ export const splitTextIntoChunks = (text: string): string[] => {
   return chunks;
 };
 
-/*
+
 export const getImageBreakPositions = (text: string): { position: number; imageNumber: number }[] => {
   const positions: { position: number; imageNumber: number }[] = [];
   let pos = 0;
@@ -68,22 +68,6 @@ export const getImageBreakPositions = (text: string): { position: number; imageN
     }
   }
   
-  return positions;
-};*/
-
-export const getImageBreakPositions = (
-  chunks: string[]
-): { position: number; imageNumber: number }[] => {
-  const positions: { position: number; imageNumber: number }[] = [];
-  let pos = 0;
-  let imageNumber = 2;
-
-  chunks.forEach((chunk) => {
-    pos += chunk.length + 3; // Add 3 for the triple newline separating chunks
-    positions.push({ position: pos, imageNumber });
-    imageNumber++;
-  });
-
   return positions;
 };
 
