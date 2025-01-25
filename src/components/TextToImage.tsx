@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { splitTextIntoChunks, MAX_TOTAL_CHARS } from "@/utils/textProcessing";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
+import JSZip from "jszip";
 import { TextControls } from "./text-to-image/TextControls";
 import { ColorSettings } from "./text-to-image/ColorSettings";
 import { PreviewCarousel } from "./text-to-image/PreviewCarousel";
-import { ImageGenerator } from "./text-to-image/ImageGenerator";
+import { splitTextIntoChunks, MAX_TOTAL_CHARS, MAX_CHARS_PER_SLIDE } from "@/utils/textProcessing";
 
 const THEMES = [
   { bg: "bg-theme-1", text: "text-gray-900" },
@@ -16,6 +19,7 @@ const THEMES = [
 
 const FONTS = [
   { name: "Georgia", class: "font-georgia" },
+  { name: "Courier New", class: "font-courier" },
   { name: "Palatino", class: "font-palatino" },
   { name: "Helvetica", class: "font-helvetica" },
   { name: "Bookman Old Style", class: "font-bookman" },
@@ -36,6 +40,129 @@ const TextToImage = () => {
   };
 
   const textChunks = text.length > 0 ? splitTextIntoChunks(text) : [];
+
+  const generateImage = async (chunk: string) => {
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      canvas.width = 1080;
+      canvas.height = 1080;
+
+      ctx.fillStyle = getComputedStyle(document.documentElement)
+        .getPropertyValue(`--theme-${selectedTheme + 1}`)
+        .trim();
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = selectedTextColor;
+      const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
+      ctx.font = `bold 48px ${fontFamily}`;
+      ctx.textAlign = alignment;
+
+      const x =
+        alignment === "left"
+          ? 100
+          : alignment === "right"
+          ? canvas.width - 100
+          : canvas.width / 2;
+
+      const maxWidth = canvas.width - 200;
+      const lines: string[] = [];
+      const paragraphs = chunk.split(/\n\n/);
+      
+      paragraphs.forEach((paragraph, pIndex) => {
+        const words = paragraph.split(" ");
+        let currentLine = "";
+        
+        words.forEach(word => {
+          const testLine = currentLine + (currentLine ? " " : "") + word;
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth) {
+            if (currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = word;
+            }
+          } else {
+            currentLine = testLine;
+          }
+        });
+        
+        if (currentLine) {
+          lines.push(currentLine);
+        }
+        
+        if (pIndex < paragraphs.length - 1) {
+          lines.push("");
+        }
+      });
+
+      const lineHeight = 60;
+      const totalTextHeight = lines.length * lineHeight;
+      let y = (canvas.height - totalTextHeight) / 2;
+
+      lines.forEach(line => {
+        if (line) {
+          ctx.fillText(line, x, y);
+        }
+        y += lineHeight;
+      });
+
+      return new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+        }, "image/png");
+      });
+    } catch (error) {
+      console.error("Error generating image:", error);
+      throw error;
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!text.trim()) {
+      toast.error("Please enter some text first!");
+      return;
+    }
+
+    try {
+      const blobs = await Promise.all(textChunks.map(generateImage));
+
+      if (blobs.length > 1) {
+        const zip = new JSZip();
+        blobs.forEach((blob, index) => {
+          zip.file(`instagram-post-${index + 1}.png`, blob);
+        });
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "instagram-posts.zip";
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const url = URL.createObjectURL(blobs[0]);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "instagram-post.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      toast.success(
+        blobs.length > 1
+          ? `${blobs.length} images zipped and downloaded successfully!`
+          : "Image downloaded successfully!"
+      );
+    } catch (error) {
+      console.error("Error generating images:", error);
+      toast.error("Failed to generate images. Please try again.");
+    }
+  };
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
@@ -62,14 +189,13 @@ const TextToImage = () => {
             setSelectedTextColor={setSelectedTextColor}
           />
 
-          <ImageGenerator
-            text={text}
-            textChunks={textChunks}
-            selectedTheme={selectedTheme}
-            selectedFont={selectedFont}
-            selectedTextColor={selectedTextColor}
-            alignment={alignment}
-          />
+          <Button
+            className="w-full"
+            onClick={handleDownload}
+            disabled={!text.trim()}
+          >
+            <Download className="mr-2 h-4 w-4" /> Download Images
+          </Button>
         </div>
 
         <div className="aspect-square">
