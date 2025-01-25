@@ -16,7 +16,6 @@ const THEMES = [
 
 const FONTS = [
   { name: "Georgia", class: "font-georgia" },
-  { name: "Courier New", class: "font-courier" },
   { name: "Palatino", class: "font-palatino" },
   { name: "Helvetica", class: "font-helvetica" },
   { name: "Bookman Old Style", class: "font-bookman" },
