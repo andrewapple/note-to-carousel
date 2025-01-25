@@ -46,6 +46,11 @@ export const splitTextIntoChunks = (text: string): string[] => {
   return chunks;
 };
 
+interface ImageBreakInfo {
+  position: number;
+  imageNumber: number;
+}
+
 export const getImageBreakPositions = (text: string): { position: number; imageNumber: number }[] => {
   const positions: { position: number; imageNumber: number }[] = [];
   let pos = 0;
