@@ -28,14 +28,29 @@ export const ImageGenerator = ({
     }
 
     try {
-      const blobs = await Promise.all(textChunks.map(chunk => 
-        generateImage(chunk, selectedTheme, selectedFont, selectedTextColor, alignment)
-      ));
+      console.log("Starting image generation for chunks:", textChunks);
+      
+      // Generate all images in parallel and wait for all to complete
+      const blobPromises = textChunks.map((chunk, index) => {
+        console.log(`Generating image ${index + 1} for chunk:`, chunk);
+        return generateImage(chunk, selectedTheme, selectedFont, selectedTextColor, alignment)
+          .then(blob => {
+            if (!blob) {
+              console.error(`Failed to generate image ${index + 1}`);
+              throw new Error(`Failed to generate image ${index + 1}`);
+            }
+            console.log(`Successfully generated image ${index + 1}`);
+            return blob;
+          });
+      });
+
+      const blobs = await Promise.all(blobPromises);
+      console.log(`Generated ${blobs.length} images successfully`);
 
       if (blobs.length > 1) {
         const zip = new JSZip();
         blobs.forEach((blob, index) => {
-          if (blob) zip.file(`instagram-post-${index + 1}.png`, blob);
+          zip.file(`instagram-post-${index + 1}.png`, blob);
         });
 
         const zipBlob = await zip.generateAsync({ type: "blob" });
