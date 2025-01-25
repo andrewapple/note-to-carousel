@@ -45,7 +45,7 @@ export const splitTextIntoChunks = (text: string): string[] => {
   return chunks;
 };
 
-/*
+
 export const getImageBreakPositions = (text: string): { position: number; imageNumber: number }[] => {
   const positions: { position: number; imageNumber: number }[] = [];
   let pos = 0;
@@ -68,29 +68,5 @@ export const getImageBreakPositions = (text: string): { position: number; imageN
     }
   }
   
-  return positions;
-};*/
-
-export const getImageBreakPositions = (text: string): { position: number; imageNumber: number }[] => {
-  const positions: { position: number; imageNumber: number }[] = [];
-  let pos = 0;
-  let imageNumber = 2;
-
-  const paragraphs = text.split(/\n/);
-
-  for (let i = 0; i < paragraphs.length; i++) {
-    const paragraph = paragraphs[i];
-
-    if (paragraph === '' && i < paragraphs.length - 2 && paragraphs[i + 1] === '' && paragraphs[i + 2] === '') {
-      // New image triggered
-      positions.push({ position: pos, imageNumber });
-      imageNumber++;
-      i += 2; // Skip the next two empty lines
-    } else {
-      // Update position
-      pos += paragraph.length + 1; // +1 for the newline character
-    }
-  }
-
   return positions;
 };
