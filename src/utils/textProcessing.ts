@@ -2,54 +2,54 @@ export const MAX_CHARS_PER_SLIDE = 600;
 export const MAX_TOTAL_CHARS = 12000;
 
 export const splitTextIntoChunks = (text: string): string[] => {
+  if (!text.trim()) return [];
+  
   const chunks: string[] = [];
-  const paragraphs = text.split(/\n{3,}/);
   let currentChunk = '';
-
-  for (const paragraph of paragraphs) {
-    // If this is a new chunk due to triple newline
-    if (currentChunk && paragraph) {
-      chunks.push(currentChunk.trim());
-      currentChunk = paragraph;
-      continue;
-    }
-
-    // Split paragraph into words
-    const words = paragraph.split(/(\s+)/);
+  
+  // Split by triple newlines first to handle manual image breaks
+  const segments = text.split(/\n{3,}/);
+  
+  segments.forEach((segment) => {
+    if (!segment.trim()) return;
     
-    for (const word of words) {
-      // Check if adding this word would exceed the limit
-      if ((currentChunk + word).length > MAX_CHARS_PER_SLIDE) {
-        if (currentChunk) {
-          chunks.push(currentChunk.trim());
-          currentChunk = word;
-        } else {
-          // If a single word is longer than the limit, we still need to include it
-          currentChunk = word;
-        }
+    // If this chunk would exceed the limit, start a new one
+    if (currentChunk && (currentChunk + segment).length > MAX_CHARS_PER_SLIDE) {
+      chunks.push(currentChunk.trim());
+      currentChunk = segment;
+    } else if (!currentChunk) {
+      currentChunk = segment;
+    } else {
+      currentChunk += segment;
+    }
+    
+    // If current chunk exceeds limit, split it
+    while (currentChunk.length > MAX_CHARS_PER_SLIDE) {
+      // Find the last space before the limit
+      const lastSpace = currentChunk.lastIndexOf(' ', MAX_CHARS_PER_SLIDE);
+      if (lastSpace === -1) {
+        // If no space found, force split at limit
+        chunks.push(currentChunk.slice(0, MAX_CHARS_PER_SLIDE).trim());
+        currentChunk = currentChunk.slice(MAX_CHARS_PER_SLIDE);
       } else {
-        currentChunk += word;
+        chunks.push(currentChunk.slice(0, lastSpace).trim());
+        currentChunk = currentChunk.slice(lastSpace + 1);
       }
     }
-  }
-
+  });
+  
   if (currentChunk) {
     chunks.push(currentChunk.trim());
   }
-
+  
   return chunks;
 };
 
-interface ImageBreakInfo {
-  position: number;
-  imageNumber: number;
-}
-
-export const getImageBreakPositions = (text: string): ImageBreakInfo[] => {
-  const positions: ImageBreakInfo[] = [];
+export const getImageBreakPositions = (text: string): { position: number; imageNumber: number }[] => {
+  const positions: { position: number; imageNumber: number }[] = [];
   let pos = 0;
   let imageNumber = 2;
-
+  
   const paragraphs = text.split(/\n/);
   
   for (let i = 0; i < paragraphs.length; i++) {
@@ -66,6 +66,6 @@ export const getImageBreakPositions = (text: string): ImageBreakInfo[] => {
       pos += paragraph.length + 1;
     }
   }
-
+  
   return positions;
 };
