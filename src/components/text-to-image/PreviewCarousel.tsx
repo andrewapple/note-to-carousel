@@ -26,14 +26,14 @@ export const PreviewCarousel = ({
   FONTS,
 }: PreviewCarouselProps) => {
   return textChunks.length > 0 ? (
-    <Carousel>
+    <Carousel className="w-full aspect-square">
       <CarouselContent>
         {textChunks.map((chunk, index) => (
           <CarouselItem key={index}>
             <div
-              className={`aspect-square rounded-lg ${
+              className={`w-full aspect-square rounded-lg ${
                 THEMES[selectedTheme].bg
-              } p-8 flex items-center justify-center text-lg whitespace-pre-wrap ${
+              } p-8 flex items-center justify-center text-lg overflow-auto ${
                 FONTS.find((f) => f.name === selectedFont)?.class || "serif"
               }`}
               style={{
@@ -41,7 +41,9 @@ export const PreviewCarousel = ({
                 color: selectedTextColor,
               }}
             >
-              {chunk}
+              <div className="max-h-full overflow-y-auto">
+                {chunk}
+              </div>
             </div>
           </CarouselItem>
         ))}
@@ -51,7 +53,7 @@ export const PreviewCarousel = ({
     </Carousel>
   ) : (
     <div
-      className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} p-8 flex items-center justify-center text-lg ${
+      className={`w-full aspect-square rounded-lg ${THEMES[selectedTheme].bg} p-8 flex items-center justify-center text-lg ${
         FONTS.find((f) => f.name === selectedFont)?.class || "serif"
       }`}
       style={{

@@ -59,8 +59,7 @@ const TextToImage = () => {
       // Text settings
       ctx.fillStyle = selectedTextColor;
       const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
-     // ctx.font = `bold 48px ${fontFamily}`;
-      ctx.font = `bold 38px ${fontFamily}`;
+      ctx.font = `bold 38px ${fontFamily}`; // Reduced font size for better fit
       ctx.textAlign = alignment;
 
       const x =
@@ -109,6 +108,13 @@ const TextToImage = () => {
       const lineHeight = 60;
       const totalTextHeight = lines.length * lineHeight;
       const verticalPadding = 100; // Minimum padding from top and bottom
+      const maxAvailableHeight = canvas.height - (2 * verticalPadding);
+
+      // If text doesn't fit, return null to trigger a new image
+      if (totalTextHeight > maxAvailableHeight) {
+        return null;
+      }
+
       const startY = Math.max(
         verticalPadding,
         (canvas.height - totalTextHeight) / 2
