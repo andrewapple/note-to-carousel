@@ -100,7 +100,7 @@ const TextToImage = () => {
         }
       });
 
-      const lineHeight = 50;
+      const lineHeight = 47;
       const totalTextHeight = lines.length * lineHeight;
       let y = (canvas.height - totalTextHeight) / 2;
 
