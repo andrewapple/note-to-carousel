@@ -48,7 +48,8 @@ const TextToImage = () => {
       if (!ctx) return;
 
       canvas.width = 1080;
-      canvas.height = 1080;
+      //canvas.height = 1080;
+      canvas.height = 1350;
 
       ctx.fillStyle = getComputedStyle(document.documentElement)
         .getPropertyValue(`--theme-${selectedTheme + 1}`)
