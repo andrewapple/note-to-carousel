@@ -57,7 +57,7 @@ const TextToImage = () => {
 
       ctx.fillStyle = selectedTextColor;
       const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
-      ctx.font = `bold 35px ${fontFamily}`;
+      ctx.font = `bold 48px ${fontFamily}`;
       ctx.textAlign = alignment;
 
       const x =
@@ -100,7 +100,7 @@ const TextToImage = () => {
         }
       });
 
-      const lineHeight = 60;
+      const lineHeight = 45;
       const totalTextHeight = lines.length * lineHeight;
       let y = (canvas.height - totalTextHeight) / 2;
 
