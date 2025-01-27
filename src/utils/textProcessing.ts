@@ -12,26 +12,48 @@ export function splitTextIntoChunks(text: string): string[] {
     const paragraphParts = paragraph.split(/\n\n/); // Split by double newline for finer granularity
 
     for (let part of paragraphParts) {
+      // If adding this part exceeds the limit, handle word-based splitting
       if ((currentChunk + "\n\n" + part).length > MAX_CHARS_PER_SLIDE) {
-        // If adding this part exceeds the limit, push the current chunk and start a new one
-        chunks.push(currentChunk);
+        // Ensure the currentChunk is not empty before pushing
+        if (currentChunk) {
+          chunks.push(currentChunk.trim());
+        }
+
         currentChunk = part;
+
+        // If the current part itself exceeds the max length, split it
+        while (currentChunk.length > MAX_CHARS_PER_SLIDE) {
+          const splitIndex = findLastSpace(currentChunk.slice(0, MAX_CHARS_PER_SLIDE));
+          if (splitIndex === -1) {
+            chunks.push(currentChunk.slice(0, MAX_CHARS_PER_SLIDE)); // No spaces, force split
+            currentChunk = currentChunk.slice(MAX_CHARS_PER_SLIDE).trim();
+          } else {
+            chunks.push(currentChunk.slice(0, splitIndex).trim());
+            currentChunk = currentChunk.slice(splitIndex).trim();
+          }
+        }
       } else {
-        // Otherwise, append the part to the current chunk
+        // Append the part to the current chunk
         currentChunk = currentChunk ? currentChunk + "\n\n" + part : part;
       }
 
-      // Check if the current chunk now exceeds the max length
+      // Handle cases where currentChunk exceeds the max length after appending
       while (currentChunk.length > MAX_CHARS_PER_SLIDE) {
-        chunks.push(currentChunk.slice(0, MAX_CHARS_PER_SLIDE));
-        currentChunk = currentChunk.slice(MAX_CHARS_PER_SLIDE).trim(); // Carry over the remainder
+        const splitIndex = findLastSpace(currentChunk.slice(0, MAX_CHARS_PER_SLIDE));
+        if (splitIndex === -1) {
+          chunks.push(currentChunk.slice(0, MAX_CHARS_PER_SLIDE)); // No spaces, force split
+          currentChunk = currentChunk.slice(MAX_CHARS_PER_SLIDE).trim();
+        } else {
+          chunks.push(currentChunk.slice(0, splitIndex).trim());
+          currentChunk = currentChunk.slice(splitIndex).trim();
+        }
       }
     }
 
-    // If we're at the end of a paragraph and still have content
+    // If we're at the end of a paragraph or chunk, push the current chunk
     if (i < paragraphs.length - 1 || currentChunk.length >= MAX_CHARS_PER_SLIDE) {
       if (currentChunk) {
-        chunks.push(currentChunk);
+        chunks.push(currentChunk.trim());
         currentChunk = "";
       }
     }
@@ -39,11 +61,17 @@ export function splitTextIntoChunks(text: string): string[] {
 
   // Push any remaining content as a final chunk
   if (currentChunk) {
-    chunks.push(currentChunk);
+    chunks.push(currentChunk.trim());
   }
 
   return chunks.slice(0, MAX_IMAGES); // Limit the total number of images if necessary
 }
+
+// Helper function to find the last space in a string
+function findLastSpace(text: string): number {
+  return text.lastIndexOf(" ");
+}
+
 
 
 /*
