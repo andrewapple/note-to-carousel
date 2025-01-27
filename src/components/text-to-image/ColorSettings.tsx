@@ -53,7 +53,7 @@ export const ColorSettings = ({
               className={`w-8 h-8 rounded-full border-2 transition-all ${
                 selectedTextColor === color.value
                   ? "border-blue-500 scale-110"
-                  : "border-gray-300"
+                  : "border-transparent"
               }`}
               style={{ backgroundColor: color.value }}
               onClick={() => setSelectedTextColor(color.value)}
