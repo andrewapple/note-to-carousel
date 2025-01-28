@@ -36,7 +36,7 @@ export const ColorSettings = ({
               className={`w-8 h-8 rounded-full ${theme.bg} border-2 transition-all ${
                 selectedTheme === index
                   ? "border-blue-500 scale-110"
-                  : "border-transparent"
+                  : "border-gray-300"
               }`}
               onClick={() => setSelectedTheme(index)}
             />
