@@ -4,8 +4,9 @@ import { Navigation } from "@/components/Navigation";
 const Index = () => {
   return (
     <>
-      <Navigation />
       <TextToImage />
+      <Navigation />
+     
     </>
   );
 };
