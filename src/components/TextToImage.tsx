@@ -171,6 +171,13 @@ const TextToImage = () => {
         Carousel
       </h1>
 
+      <Button variant="ghost">
+        <Link to="/about">About</Link>
+      </Button>
+      <Button variant="ghost">
+        <Link to="/contact">Contact</Link>
+      </Button>
+
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
           <TextControls
