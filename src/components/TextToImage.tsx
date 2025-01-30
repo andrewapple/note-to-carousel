@@ -7,8 +7,7 @@ import { TextControls } from "./text-to-image/TextControls";
 import { ColorSettings } from "./text-to-image/ColorSettings";
 import { PreviewCarousel } from "./text-to-image/PreviewCarousel";
 import { splitTextIntoChunks, MAX_TOTAL_CHARS, MAX_CHARS_PER_SLIDE } from "@/utils/textProcessing";
-import { Button } from './Button'; // Adjust the import based on your Button component location
-import { Link } from 'react-router-dom';
+
 
 const THEMES = [
   { bg: "bg-theme-1", text: "text-gray-900" },
@@ -173,14 +172,15 @@ const TextToImage = () => {
         Carousel
       </h1>
 
-     <div>
+    
+
       <Button variant="ghost">
-        <Link to="/about">About Us</Link>
-      </Button>
-      <Button variant="ghost">
-        <Link to="/contact">Contact Info</Link>
-      </Button>
-    </div>
+  <a href="/about">About</a>
+</Button>
+<Button variant="ghost">
+  <a href="/contact">Contact</a>
+</Button>
+
 
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
