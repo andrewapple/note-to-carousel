@@ -5,7 +5,7 @@ const Index = () => {
   return (
     <>
       <TextToImage />
-      <Navigation />
+    {/*  <Navigation /> */}
      
     </>
   );
