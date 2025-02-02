@@ -65,7 +65,7 @@ export default {
           3: "#DEE2E6",
           4: "#CED4DA",
           5: "#000000",
-          6: "#FAEBD7",
+       //   6: "#FAEBD7",
         },
       },
     },
