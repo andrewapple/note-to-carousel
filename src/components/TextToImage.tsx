@@ -15,7 +15,7 @@ const THEMES = [
   { bg: "bg-theme-3", text: "text-gray-900" },
   { bg: "bg-theme-4", text: "text-gray-900" },
   { bg: "bg-theme-5", text: "text-gray-900" },
-  { bg: "bg-theme-6", text: "text-gray-900" },
+//  { bg: "bg-theme-6", text: "text-gray-900" },
 ];
 
 const FONTS = [
