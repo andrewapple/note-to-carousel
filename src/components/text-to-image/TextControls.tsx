@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getImageBreakPositions } from "@/utils/textProcessing";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 interface TextControlsProps {
   text: string;
@@ -27,6 +28,11 @@ const FONTS = [
   { name: "Palatino", class: "font-palatino" },
   { name: "Helvetica", class: "font-helvetica" },
   { name: "Bookman Old Style", class: "font-bookman" },
+   { name: "Inter", class: "font-inter" },
+  { name: "Poppins", class: "font-poppins" },
+  { name: "Lora", class: "font-lora" },
+  { name: "Merriweather", class: "font-merriweather" },
+  { name: "Roboto", class: "font-roboto" },
 ];
 
 export const TextControls = ({
