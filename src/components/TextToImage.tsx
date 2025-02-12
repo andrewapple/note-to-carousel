@@ -7,6 +7,8 @@ import { TextControls } from "./text-to-image/TextControls";
 import { ColorSettings } from "./text-to-image/ColorSettings";
 import { PreviewCarousel } from "./text-to-image/PreviewCarousel";
 import { splitTextIntoChunks, MAX_TOTAL_CHARS, MAX_CHARS_PER_SLIDE } from "@/utils/textProcessing";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
 
 
 const THEMES = [
@@ -24,6 +26,11 @@ const FONTS = [
   { name: "Palatino", class: "font-palatino" },
   { name: "Helvetica", class: "font-helvetica" },
   { name: "Bookman Old Style", class: "font-bookman" },
+  { name: "Inter", class: "font-inter" },
+  { name: "Poppins", class: "font-poppins" },
+  { name: "Lora", class: "font-lora" },
+  { name: "Merriweather", class: "font-merriweather" },
+  { name: "Roboto", class: "font-roboto" },
 ];
 
 const TextToImage = () => {
