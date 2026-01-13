@@ -45,28 +45,26 @@ const Contact = () => {
           <br />
           - write your blog or article in the text editor of your choice
           <br />
-          - paste the entire piece into the Caranova textbox 
-          <br />
-          (If, at this point, you click "Download Images", you will get a zip file with
-          Instagram-ready carousel cards with the text split into groups of 600
-          characters. However, the creative artist you are, you probably want to control what
-          goes where.)
-          <br />
-          <br />
-          Maybe you have a sentence that carries a punch, and you
-          want it to have its own card. 
+          - paste the entire piece into the Caranova textbox  
           <br />
           - add a blank line after a sentence by hitting "Enter" twice
           <br />
           - push a sentence to the next card by hitting "Enter" three times
           <br />
-          If this is confusing, the preview box on the right will accurately show what text will be on what card. It is an exact preview of what you will be downloading.
+          <br />
+          The preview box on the right will accurately show what text will be on what card. It is an exact preview of what you will be downloading.
           <br />
           <br />
           If you don't hate this niche tool, consider a visit to my quotes app{" "}
-          <a href="https://hmmmpops.netlify.app/" target="_blank" rel="noreferrer">
-            Hmmmpops
-          </a>.
+         <a
+  href="https://hmmmpops.netlify.app/"
+  target="_blank"
+  rel="noreferrer"
+  className="text-blue-600 font-bold underline hover:text-blue-800"
+>
+  Hmmmpops
+</a>.
+
         </p>
       </div>
     </div>
