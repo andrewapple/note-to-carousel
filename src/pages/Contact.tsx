@@ -37,23 +37,30 @@ const Contact = () => {
           I describe <strong>Caranova</strong> as "graphic design with the writer
           in mind". It offers some room for creativity, but none more than you
           would have were you to traditionally publish a book. You can choose
-          from a small list of font and background options. Here is how it works:
+          from a small list of font and background options. 
           <br />
           <br />
-          You write your blog or article in the text editor of your choice. When
-          you are finished, paste the entire piece into the Caranova textbox. If
-          you were to then click "Download Images", you would get a zip file with
+          Here is how it works:
+          <br />
+          <br />
+          - write your blog or article in the text editor of your choice
+          <br />
+          - paste the entire piece into the Caranova textbox 
+          <br />
+          (If, at this point, you click "Download Images", you will get a zip file with
           Instagram-ready carousel cards with the text split into groups of 600
-          characters.
+          characters. However, the creative artist you are, you probably want to control what
+          goes where.)
           <br />
           <br />
-          However, the creative artist you are, you probably want to control what
-          goes where. Maybe you have a sentence that carries a punch, and you
-          want it to have its own card. Add a blank line between two sentences or
-          paragraphs by hitting "Enter" twice. If you want to push a sentence to
-          the next card, hit "Enter" three times. If this is confusing, the
-          preview box on the right will accurately show what text will be on what
-          card. It is an exact preview of what you will be downloading.
+          Maybe you have a sentence that carries a punch, and you
+          want it to have its own card. 
+          <br />
+          - add a blank line after a sentence by hitting "Enter" twice
+          <br />
+          - push a sentence to the next card by hitting "Enter" three times
+          <br />
+          If this is confusing, the preview box on the right will accurately show what text will be on what card. It is an exact preview of what you will be downloading.
           <br />
           <br />
           If you don't hate this niche tool, consider a visit to my quotes app{" "}
