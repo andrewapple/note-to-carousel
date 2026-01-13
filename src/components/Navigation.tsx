@@ -9,7 +9,7 @@ export const Navigation = () => {
     <nav className="flex gap-4 justify-center mb-8">
       {!isHome && (
         <Button variant="ghost" asChild>
-          <Link to="/">Home</Link>
+          <Link to="/">Go Back</Link>
         </Button>
       )}
       <Button variant="ghost" asChild>
