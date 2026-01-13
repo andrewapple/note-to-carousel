@@ -13,10 +13,7 @@ export const Navigation = () => {
         </Button>
       )}
       <Button variant="ghost" asChild>
-        <Link to="/about">About</Link>
-      </Button>
-      <Button variant="ghost" asChild>
-        <Link to="/contact">Contact</Link>
+        <Link to="/contact">About</Link>
       </Button>
     </nav>
   );
