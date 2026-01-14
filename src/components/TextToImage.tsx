@@ -127,6 +127,11 @@ const TextToImage = () => {
   };
 
   const handleDownload = async () => {
+ window.gtag('event', 'download_images', {
+    event_category: 'engagement',
+    event_label: 'Download Images Button',
+  });
+    
     if (!text.trim()) {
       toast.error("Please enter some text first!");
       return;
