@@ -34,6 +34,7 @@ const Contact = () => {
           I hate a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
           then people will think I'm apologizing for something. 
           <br />
+          <br />
           I created a Canva template, but it took too long to copy a few sentences at a time and paste them into each separate image
            while being mindful to not accidentally adjust the font size for one image or bump the location of the text box on another.
           The tediousness of it had me blushing at <em>wall of text</em> captions. 
