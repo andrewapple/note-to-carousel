@@ -40,7 +40,7 @@ const Contact = () => {
           The tediousness of it had me blushing at <em>wall of text</em> captions. 
           <br />
           <br />
-          Here is how it works:
+          My solution is Caranova, and here is how it works:
           <br />
           <br />
           - write your piece in any text editor
