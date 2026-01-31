@@ -18,11 +18,43 @@ const Contact = () => {
       <Navigation />
 
       <div className="prose prose-lg mx-auto">
-        <h2 className="text-2xl font-semibold mt-8 mb-4">Get in Touch</h2>
+        <h2 className="text-2xl font-semibold mt-8 mb-4"></h2>
 
         <p className="mb-6">
-          Hi! My name is Andrew Apple, and I hope you are enjoying my nifty little
-          web app. If you have questions or anything to say, remark, confess,
+          <br />
+          I describe <strong>Caranova</strong> as "graphic design with the writer
+          in mind". 
+          <br />
+          <br />
+          I built this tool because I wanted to share my writing on Instagram. I wanted to do it without dropping a <em>wall of text</em> caption or 
+          loading up a set of <em>Notes App</em> screenshots.  
+          <br />
+          <br />
+          I built this tool because I wanted to share my writing on Instagram, and the current options for doing that all suck.
+          I hate a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
+          then people will think I'm apologizing for something. 
+          <br />
+          I created a Canva template, but it took too long to copy a few sentences at a time and paste them into each separate image
+           while being mindful to not accidentally adjust the font size for one image or bump the location of the text box on another.
+          The tediousness of it had me blushing at <em>wall of text</em> captions. 
+          <br />
+          <br />
+          Here is how it works:
+          <br />
+          <br />
+          - write your piece in any text editor
+          <br />
+          - paste it into the Caranova textbox  
+          <br />
+          - add a blank line after a sentence by hitting "Enter" twice
+          <br />
+          - push a sentence to the next card by hitting "Enter" three times
+          <br />
+          <br />
+          The preview box on the right will accurately show <em>what</em> text will be on <em>what</em> card.
+          <br />
+          <br />
+          If you have questions or anything to say, remark, confess,
           whatever, email me at{" "}
           <span
             onClick={copyEmail}
@@ -32,38 +64,6 @@ const Contact = () => {
             {email}
           </span>
           . Put "Caranova" in the subject line.
-          <br />
-          <br />
-          I describe <strong>Caranova</strong> as "graphic design with the writer
-          in mind". It offers some room for creativity, but none more than you
-          would have were you to traditionally publish a book. You can choose
-          from a small list of font and background options. 
-          <br />
-          <br />
-          Here is how it works:
-          <br />
-          <br />
-          - write your blog or article in the text editor of your choice
-          <br />
-          - paste the entire piece into the Caranova textbox  
-          <br />
-          - add a blank line after a sentence by hitting "Enter" twice
-          <br />
-          - push a sentence to the next card by hitting "Enter" three times
-          <br />
-          <br />
-          The preview box on the right will accurately show what text will be on what card. It is an exact preview of what you will be downloading.
-          <br />
-          <br />
-          If you don't hate this niche tool, consider a visit to my quotes app{" "}
-         <a
-  href="https://hmmmpops.netlify.app/"
-  target="_blank"
-  rel="noreferrer"
-  className="text-blue-600 font-bold underline hover:text-blue-800"
->
-  Hmmmpops
-</a>.
 
         </p>
       </div>
