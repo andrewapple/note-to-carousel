@@ -26,7 +26,7 @@ const Contact = () => {
           in mind". 
           <br />
           <br />
-          I built this tool because I wanted to share my writing on Instagram, and the current options for doing that all stink.
+          I built this tool because I wanted to share my writing on Instagram, and the current options for doing that stink.
           I won't read a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
           people's eyes glaze over the second they see that font. 
           <br />
