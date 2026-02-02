@@ -27,8 +27,7 @@ const Contact = () => {
           <br />
           <br />
           I built this tool because I wanted to share my writing on Instagram, and the current options for doing that stink.
-          I won't read a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
-          people's eyes glaze over the second they see that font. 
+          I won't read a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but those are for apologies and announcements. 
           <br />
           <br />
           I created a Canva template, but copying and pasting text into each image while keeping the formatting consistent was a slog.
