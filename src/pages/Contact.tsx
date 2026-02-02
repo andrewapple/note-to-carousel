@@ -26,18 +26,13 @@ const Contact = () => {
           in mind". 
           <br />
           <br />
-          I built this tool because I wanted to share my writing on Instagram. I wanted to do it without dropping a <em>wall of text</em> caption or 
-          loading up a set of <em>Notes App</em> screenshots.  
+          I built this tool because I wanted to share my writing on Instagram, and the current options for doing that all stink.
+          I won't read a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
+          people's eyes glaze over the second they see that font. 
           <br />
           <br />
-          I built this tool because I wanted to share my writing on Instagram, and the current options for doing that all suck.
-          I hate a <em>wall of text</em> caption so why would I post one? I could throw up some <em>Notes App</em> screenshots, but
-          then people will think I'm apologizing for something. 
-          <br />
-          <br />
-          I created a Canva template, but it took too long to copy a few sentences at a time and paste them into each separate image
-           while being mindful to not accidentally adjust the font size for one image or bump the location of the text box on another.
-          The tediousness of it had me blushing at <em>wall of text</em> captions. 
+          I created a Canva template, but copying and pasting text into each image while keeping the formatting consistent was a slog.
+          The tediousness of it had me on the verge of ring shopping for <em>wall of text</em> captions. 
           <br />
           <br />
           My solution is Caranova, and here is how it works:
