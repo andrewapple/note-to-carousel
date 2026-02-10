@@ -28,12 +28,21 @@ const FONTS = [
   { name: "Bookman Old Style", class: "font-bookman" },
 ];
 
+const FONT_SIZES = [
+  { name: "Small", size: 36, lineHeight: 40 },
+  { name: "Medium-Small", size: 42, lineHeight: 46 },
+  { name: "Medium", size: 48, lineHeight: 52 },      // default
+  { name: "Medium-Large", size: 54, lineHeight: 58 },
+  { name: "Large", size: 60, lineHeight: 64 }
+];
+
 const TextToImage = () => {
   const [text, setText] = useState("");
   const [selectedTheme, setSelectedTheme] = useState(0);
   const [selectedFont, setSelectedFont] = useState(FONTS[0].name);
   const [selectedTextColor, setSelectedTextColor] = useState("#000000");
   const [alignment, setAlignment] = useState<"left" | "center" | "right">("left");
+  const [selectedFontSize, setSelectedFontSize] = useState(2);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
@@ -61,7 +70,9 @@ const TextToImage = () => {
 
       ctx.fillStyle = selectedTextColor;
       const fontFamily = FONTS.find(f => f.name === selectedFont)?.name || 'serif';
-      ctx.font = `bold 48px ${fontFamily}`;
+     // ctx.font = `bold 48px ${fontFamily}`;
+      const fontSize = FONT_SIZES[selectedFontSize];
+      ctx.font = `bold ${fontSize.size}px ${fontFamily}`;
       ctx.textAlign = alignment;
 
       const x =
@@ -104,7 +115,8 @@ const TextToImage = () => {
         }
       });
 
-      const lineHeight = 47;
+    //  const lineHeight = 47;
+      const lineHeight = fontSize.lineHeight;
       const totalTextHeight = lines.length * lineHeight;
       let y = (canvas.height - totalTextHeight) / 2;
 
@@ -188,6 +200,8 @@ const TextToImage = () => {
             setAlignment={setAlignment}
             selectedFont={selectedFont}
             setSelectedFont={setSelectedFont}
+            selectedFontSize={selectedFontSize}
+            setSelectedFontSize={setSelectedFontSize}
             maxTotalChars={MAX_TOTAL_CHARS}
           />
 
@@ -214,8 +228,10 @@ const TextToImage = () => {
             selectedFont={selectedFont}
             selectedTextColor={selectedTextColor}
             alignment={alignment}
+            selectedFontSize={selectedFontSize}
             THEMES={THEMES}
             FONTS={FONTS}
+            FONT_SIZES={FONT_SIZES}
           />
         </div>
       </div>
