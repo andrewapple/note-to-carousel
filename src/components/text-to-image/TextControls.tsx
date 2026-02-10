@@ -19,6 +19,8 @@ interface TextControlsProps {
   setAlignment: (alignment: "left" | "center" | "right") => void;
   selectedFont: string;
   setSelectedFont: (font: string) => void;
+  selectedFontSize: number;  
+  setSelectedFontSize: (size: number) => void;  
   maxTotalChars: number;
 }
 
@@ -30,6 +32,14 @@ const FONTS = [
   { name: "Bookman Old Style", class: "font-bookman" },
 ];
 
+const FONT_SIZES = [
+  { name: "S", label: "Small" },
+  { name: "M-", label: "Medium-Small" },
+  { name: "M", label: "Medium" },
+  { name: "M+", label: "Medium-Large" },
+  { name: "L", label: "Large" }
+];
+
 export const TextControls = ({
   text,
   onTextChange,
@@ -37,6 +47,8 @@ export const TextControls = ({
   setAlignment,
   selectedFont,
   setSelectedFont,
+  selectedFontSize,
+  setSelectedFontSize,
   maxTotalChars,
 }: TextControlsProps) => {
   const imageBreaks = getImageBreakPositions(text);
@@ -99,6 +111,23 @@ export const TextControls = ({
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <label className="text-sm font-medium">Font Size</label>
+        <div className="flex gap-1">
+          {FONT_SIZES.map((size, index) => (
+            <Button
+              key={size.name}
+              variant={selectedFontSize === index ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedFontSize(index)}
+              className="min-w-[50px]"
+            >
+              {size.name}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
