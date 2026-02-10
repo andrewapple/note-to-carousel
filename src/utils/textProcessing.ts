@@ -1,5 +1,5 @@
-export const MAX_TOTAL_CHARS = 12000;
-export const MAX_IMAGES = 20;
+export const MAX_TOTAL_CHARS = 24000;
+export const MAX_IMAGES = 100;
 export const MAX_CHARS_PER_SLIDE = 600;
 
 export function splitTextIntoChunks(text: string): string[] {
