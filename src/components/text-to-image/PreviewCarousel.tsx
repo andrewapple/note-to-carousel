@@ -12,8 +12,10 @@ interface PreviewCarouselProps {
   selectedFont: string;
   selectedTextColor: string;
   alignment: "left" | "center" | "right";
+  selectedFontSize: number;
   THEMES: Array<{ bg: string; text: string }>;
   FONTS: Array<{ name: string; class: string }>;
+  FONT_SIZES: Array<{ name: string; size: number; lineHeight: number }>;
 }
 
 export const PreviewCarousel = ({
@@ -22,9 +24,14 @@ export const PreviewCarousel = ({
   selectedFont,
   selectedTextColor,
   alignment,
+  selectedFontSize,
   THEMES,
   FONTS,
+  FONT_SIZES,
 }: PreviewCarouselProps) => {
+
+  const previewFontSize = `${FONT_SIZES[selectedFontSize].size * 0.35}px`;
+  
   return textChunks.length > 0 ? (
     <Carousel>
       <CarouselContent>
@@ -33,12 +40,13 @@ export const PreviewCarousel = ({
             <div
               className={`aspect-square rounded-lg ${
                 THEMES[selectedTheme].bg
-              } p-8 flex items-center justify-center text-lg whitespace-pre-wrap ${
+              } p-8 flex items-center justify-center whitespace-pre-wrap ${
                 FONTS.find((f) => f.name === selectedFont)?.class || "serif"
               }`}
               style={{
                 textAlign: alignment,
                 color: selectedTextColor,
+                fontSize: previewFontSize,
               }}
             >
               {chunk}
@@ -51,12 +59,13 @@ export const PreviewCarousel = ({
     </Carousel>
   ) : (
     <div
-      className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} p-8 flex items-center justify-center text-lg ${
+      className={`aspect-square rounded-lg ${THEMES[selectedTheme].bg} p-8 flex items-center justify-center ${
         FONTS.find((f) => f.name === selectedFont)?.class || "serif"
       }`}
       style={{
         textAlign: alignment,
         color: selectedTextColor,
+        fontSize: previewFontSize,
       }}
     >
       Preview will appear here
